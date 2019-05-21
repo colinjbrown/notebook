@@ -173,6 +173,7 @@ define([
         this.mode = 'command';
         this.set_dirty(false);
         this.metadata = {};
+        this.metadata.logger_events = this.metadata.logger_events || [];
         this._checkpoint_after_save = false;
         this.last_checkpoint = null;
         this.checkpoints = [];
@@ -371,6 +372,47 @@ define([
             // Mode 'null' should be plain, unhighlighted text.
             var cm_mode = langinfo.codemirror_mode || langinfo.name || 'null';
             that.set_codemirror_mode(cm_mode);
+
+            that.events.on('execute.CodeCell', function (event, data) {
+				Jupyter.notebook.metadata.logger_events.push({ 'executed': data.cell.get_text(), 'timestamp':Date.now() });
+			});
+
+			that.events.on('select.Cell', function (event, data) {
+				Jupyter.notebook.metadata.logger_events.push({ 'selected': data.cell.get_text(), 'timestamp':Date.now() });
+			});
+
+			that.events.on('kernel_restarting.Kernel', function (event, data) {
+				Jupyter.notebook.metadata.logger_events.push({ 'event': 'kernel_restarting', 'timestamp':Date.now() });
+			});
+
+			that.events.on('create.Cell', function (event, data) {
+				Jupyter.notebook.metadata.logger_events.push({ 'event': 'created_cell', 'timestamp':Date.now() });
+			});
+
+
+			if(Jupyter.notebook.metadata.time != undefined){
+				var countDownDate = new Date(Date.now()+ Jupyter.notebook.metadata.time*60000).getTime();
+
+				// Update the count down every 1 second
+				var x = setInterval(function() {
+
+				  // Get todays date and time
+				  var now = new Date().getTime();
+
+				  // Find the distance between now and the count down date
+				  var distance = countDownDate - now;
+
+				  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+				  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+				  document.getElementById("time_left").innerHTML = minutes + "m " + seconds + "s ";
+
+				  if (distance < 0) {
+					Jupyter.notebook.close_and_halt();
+				  }
+				}, 1000);
+			}
+
         });
         
         this.events.on('kernel_idle.Kernel', function () {
