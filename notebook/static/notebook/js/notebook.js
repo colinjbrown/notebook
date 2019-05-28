@@ -373,6 +373,8 @@ define([
             var cm_mode = langinfo.codemirror_mode || langinfo.name || 'null';
             that.set_codemirror_mode(cm_mode);
 
+            that.metadata.logger_events = that.metadata.logger_events || [];
+
             that.events.on('execute.CodeCell', function (event, data) {
 				Jupyter.notebook.metadata.logger_events.push({ 'executed': data.cell.get_text(), 'timestamp':Date.now() });
 			});
