@@ -376,19 +376,23 @@ define([
             that.metadata.logger_events = that.metadata.logger_events || [];
 
             that.events.on('execute.CodeCell', function (event, data) {
-				Jupyter.notebook.metadata.logger_events.push({ 'executed': data.cell.get_text(), 'timestamp':Date.now() });
+                Jupyter.notebook.metadata.logger_events.push({ 'executed': data.cell.get_text(), 'timestamp':Date.now() });
+                Jupyter.notebook.save_notebook();
 			});
 
 			that.events.on('select.Cell', function (event, data) {
-				Jupyter.notebook.metadata.logger_events.push({ 'selected': data.cell.get_text(), 'timestamp':Date.now() });
+                Jupyter.notebook.metadata.logger_events.push({ 'selected': data.cell.get_text(), 'timestamp':Date.now() });
+                Jupyter.notebook.save_notebook();
 			});
 
 			that.events.on('kernel_restarting.Kernel', function (event, data) {
-				Jupyter.notebook.metadata.logger_events.push({ 'event': 'kernel_restarting', 'timestamp':Date.now() });
+                Jupyter.notebook.metadata.logger_events.push({ 'event': 'kernel_restarting', 'timestamp':Date.now() });
+                Jupyter.notebook.save_notebook();
 			});
 
 			that.events.on('create.Cell', function (event, data) {
-				Jupyter.notebook.metadata.logger_events.push({ 'event': 'created_cell', 'timestamp':Date.now() });
+                Jupyter.notebook.metadata.logger_events.push({ 'event': 'created_cell', 'timestamp':Date.now() });
+                Jupyter.notebook.save_notebook();
 			});
 
 
